@@ -30,21 +30,9 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            #!/bin/bash
-
-            # Update the system
-            sudo yum -y update
-
-            # Install Apache
-            sudo yum -y install httpd
-
-            # Start and enable Apache service
-            sudo systemctl start httpd
-            sudo systemctl enable httpd
-
-            # Optional: Set permissions (if needed)
-            sudo chown -R ec2-user:ec2-user /var/www/html
-
-            # Deploy your app files from a known directory (e.g., ~/app or repo)
-            cd ~/app  # or wherever your build output is
-            sudo cp -r . /var/www/html/
+            sudo apt-get -y update
+            sudo apt-get install -y apache2
+            sudo systemctl start apache2
+            sudo systemctl enable apache2
+            cd home
+            sudo mv * /var/www/html
