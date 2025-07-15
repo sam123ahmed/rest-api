@@ -1,44 +1,6 @@
-# name: Push-to-EC2
-
-# # Trigger deployment only on push to main branch
-# on:
-#   push:
-#     branches:
-#       - develop
-
-# jobs:
-#   deploy:
-#     name: Deploy to EC2 on master branch push
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - name: Checkout the files
-#         uses: actions/checkout@v2
-
-#       - name: Deploy to Server 1
-#         uses: easingthemes/ssh-deploy@main
-#         env:
-#           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-#           REMOTE_HOST: ${{ secrets.HOST_DNS }}
-#           REMOTE_USER: ${{ secrets.USERNAME }}
-#           TARGET: ${{ secrets.TARGET_DIR }}
-
-#       - name: Executing remote ssh commands using ssh key
-#         uses: appleboy/ssh-action@master
-#         with:
-#           host: ${{ secrets.HOST_DNS }}
-#           username: ${{ secrets.USERNAME }}
-#           key: ${{ secrets.EC2_SSH_KEY }}
-#           script: |
-#             sudo apt-get -y update
-#             sudo apt-get install -y apache2
-#             sudo systemctl start apache2
-#             sudo systemctl enable apache2
-#             cd home
-#             sudo mv * /var/www/html
-
 name: Push-to-EC2
 
+# Trigger deployment only on push to main branch
 on:
   push:
     branches:
@@ -46,34 +8,31 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to EC2 on develop branch push
+    name: Deploy to EC2 on master branch push
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout the files
         uses: actions/checkout@v2
 
-      - name: Deploy files to EC2
+      - name: Deploy to Server 1
         uses: easingthemes/ssh-deploy@main
         env:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
           REMOTE_HOST: ${{ secrets.HOST_DNS }}
-          REMOTE_USER: ${{ secrets.USERNAME }} # likely "ec2-user"
-          TARGET: ${{ secrets.TARGET_DIR }} # e.g., /home/ec2-user/app
+          REMOTE_USER: ${{ secrets.USERNAME }}
+          TARGET: ${{ secrets.TARGET_DIR }}
 
-      - name: Run remote setup commands
+      - name: Executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_DNS }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Update system and install httpd (Apache on Amazon Linux)
-            sudo yum update -y
-            sudo yum install -y httpd
-            sudo systemctl enable httpd
-            sudo systemctl start httpd
-
-            # Move your app to Apache root (assuming HTML files or similar)
-            sudo rm -rf /var/www/html/*
-            sudo cp -r ${{ secrets.TARGET_DIR }}/* /var/www/html/
+            sudo apt-get -y update
+            sudo apt-get install -y apache2
+            sudo systemctl start apache2
+            sudo systemctl enable apache2
+            cd home
+            sudo mv * /var/www/html
