@@ -30,16 +30,21 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            #!/bin/bash
+
             # Update the system
             sudo yum -y update
 
-            # Install Apache (httpd on Amazon Linux)
+            # Install Apache
             sudo yum -y install httpd
 
             # Start and enable Apache service
             sudo systemctl start httpd
             sudo systemctl enable httpd
 
-            # Move all contents from ~/home to Apache root directory
-            cd ~
-            sudo mv * /var/www/html/
+            # Optional: Set permissions (if needed)
+            sudo chown -R ec2-user:ec2-user /var/www/html
+
+            # Deploy your app files from a known directory (e.g., ~/app or repo)
+            cd ~/app  # or wherever your build output is
+            sudo cp -r . /var/www/html/
